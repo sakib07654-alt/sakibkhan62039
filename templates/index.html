@@ -37,13 +37,22 @@
         
         img { width: 100%; border-radius: 15px; border: 2px solid rgba(255, 255, 255, 0.1); }
 
-        /* Report Style */
+        .error-box {
+            background: rgba(255, 0, 85, 0.1);
+            border: 1px solid #ff0055;
+            color: #ff0055;
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 20px;
+            text-align: center;
+            font-weight: bold;
+        }
+
         .printable-report {
             background: white; color: black; padding: 40px; 
             margin-top: 40px; border-radius: 0; border: 2px solid #000;
         }
 
-        /* Print Settings - Sirf Report Print Hogi */
         @media print {
             body * { visibility: hidden; }
             .printable-report, .printable-report * { visibility: visible; }
@@ -64,6 +73,13 @@
         <br>
         <button type="submit" class="analyze-btn">START DEEP SCAN</button>
     </form>
+
+    <!-- Error Handling -->
+    {% if error %}
+    <div class="error-box">
+        {{ error }}
+    </div>
+    {% endif %}
 
     {% if data %}
     <div class="result-grid">
@@ -93,7 +109,7 @@
         </h2>
         <div style="display: flex; justify-content: space-between; margin: 20px 0;">
             <span><strong>CASE ID:</strong> {{ data.case_id }}</span>
-            <span><strong>DATE:</strong> 12-05-2026</span>
+            <span><strong>DATE:</strong> 13-05-2026</span>
         </div>
         <table style="width: 100%; border-collapse: collapse;">
             <tr style="background: #eee;">

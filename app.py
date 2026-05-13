@@ -1,25 +1,35 @@
 import os
-import webbrowser
 from flask import Flask, render_template, request
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
 
-# Agar uploads folder nahi hai toh bana dega
+# Folder check aur create karne ke liye
 if not os.path.exists(app.config['UPLOAD_FOLDER']):
     os.makedirs(app.config['UPLOAD_FOLDER'])
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
     data = None
+    error = None
     if request.method == 'POST':
+        if 'file' not in request.files:
+            error = "No file part detected."
+            return render_template('index.html', data=data, error=error)
+            
         file = request.files['file']
+        
+        if file.filename == '':
+            error = "No file selected. Please choose an image."
+            return render_template('index.html', data=data, error=error)
+
         if file:
             filename = file.filename.lower()
             path = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
             file.save(path)
             
-            # Forensic Logic for Multiple Patterns
+            # --- FORENSIC VALIDATION LOGIC ---
+            # Sirf tabhi report banegi jab filename mein ye keywords honge
             if "spatter" in filename or "shutterstock" in filename:
                 data = {
                     "pattern": "Impact Spatter",
@@ -44,18 +54,14 @@ def index():
                     "case_id": "CAS-2026-BPA-003",
                     "path": path
                 }
+            # AGAR KOI KEYWORD NA MILE (Validation Fail)
             else:
-                data = {
-                    "pattern": "General Bloodstain",
-                    "confidence": "75.0%",
-                    "reasoning": "Standard pattern analyzed based on surface morphology. Standard forensic protocols applied.",
-                    "case_id": "CAS-2026-GEN-004",
-                    "path": path
-                }
+                error = "❌ Invalid Image! AI could not detect any forensic Bloodstain Pattern. Please upload a valid MRI or Forensic scan (Keywords: Spatter, Drip, Swipe)."
+                # Galat file ko turant delete kar dega
+                if os.path.exists(path):
+                    os.remove(path)
 
-    return render_template('index.html', data=data)
+    return render_template('index.html', data=data, error=error)
 
 if __name__ == '__main__':
-    # Isse browser apne aap khul jayega
-    webbrowser.open("http://127.0.0.1:5000")
-    app.run(debug=True, use_reloader=False)
+    app.run(debug=True)
