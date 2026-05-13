@@ -3,87 +3,181 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BPA AI | Forensic Dashboard</title>
+    <title>Forensic AI Analyzer v3.0</title>
     <style>
+        :root {
+            --primary-bg: #0b0e14;
+            --card-bg: #161b22;
+            --accent-blue: #00d2ff;
+            --accent-pink: #ff2d55;
+            --text-main: #e6edf3;
+        }
+
         body {
-            background: radial-gradient(circle, #0f0f1a, #050505); 
-            color: white; font-family: 'Segoe UI', Tahoma, sans-serif;
-            margin: 0; padding: 20px;
-            display: flex; justify-content: center;
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--primary-bg);
+            color: var(--text-main);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
         }
+
         .dashboard {
-            background: rgba(255, 255, 255, 0.03); 
-            backdrop-filter: blur(15px);
-            border: 1px solid rgba(0, 212, 255, 0.2);
-            padding: 40px; border-radius: 25px; 
-            width: 95%; max-width: 1100px;
-            box-shadow: 0 0 50px rgba(0, 0, 0, 0.8);
+            width: 100%;
+            max-width: 450px;
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            border: 1px solid #30363d;
+            margin: 20px;
         }
-        .header { border-left: 15px solid #00d4ff; padding-left: 20px; margin-bottom: 40px; }
-        .header h1 { font-size: 40px; margin: 0; letter-spacing: 3px; color: #00d4ff; }
-        .result-grid { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 30px; margin-top: 30px; }
-        .stat-box { 
-            background: rgba(0, 212, 255, 0.05); padding: 20px; 
-            border-radius: 15px; border: 1px solid #00d4ff; margin-bottom: 15px;
+
+        .header {
+            border-left: 8px solid var(--accent-blue);
+            padding-left: 15px;
+            margin-bottom: 30px;
         }
-        .analyze-btn {
-            background: #00d4ff; border: none; color: #000;
-            padding: 15px 30px; cursor: pointer; font-size: 18px;
-            font-weight: bold; border-radius: 8px; transition: 0.3s;
+
+        h1 {
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin: 0;
+            font-size: 2rem;
+            color: var(--accent-blue);
         }
+
+        .version {
+            color: #8b949e;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+
+        .upload-section {
+            background: rgba(255,255,255,0.05);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        input[type="file"] { margin-bottom: 15px; }
+
+        .btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: 0.3s;
+        }
+
+        .btn-scan {
+            background: var(--accent-blue);
+            color: #000;
+        }
+
+        .btn-download {
+            background: #ffffff;
+            color: #000;
+            margin-top: 20px;
+        }
+
         .error-box {
-            background: rgba(255, 0, 85, 0.2); border: 1px solid #ff0055;
-            color: #ff0055; padding: 20px; border-radius: 12px;
-            margin: 20px 0; text-align: center; font-weight: bold;
+            background: rgba(255, 45, 85, 0.1);
+            border: 1px solid var(--accent-pink);
+            color: var(--accent-pink);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            text-align: center;
         }
-        img { width: 100%; border-radius: 15px; border: 2px solid rgba(255, 255, 255, 0.1); }
-        .printable-report { background: white; color: black; padding: 40px; margin-top: 40px; border: 2px solid #000; }
+
+        .result-card {
+            margin-top: 30px;
+            border-top: 1px solid #30363d;
+            padding-top: 20px;
+        }
+
+        .preview-img {
+            width: 100%;
+            border-radius: 15px;
+            margin-bottom: 15px;
+            border: 2px solid #30363d;
+        }
+
+        .stat {
+            background: rgba(0, 210, 255, 0.05);
+            border: 1px solid var(--accent-blue);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+
+        .stat-title { color: #8b949e; font-size: 0.8rem; text-transform: uppercase; }
+        .stat-value { font-size: 1.4rem; font-weight: bold; display: block; }
+        .accuracy { color: var(--accent-pink); }
+
+        /* --- PRINT SETTINGS FOR PDF --- */
         @media print {
-            body * { visibility: hidden; }
-            .printable-report, .printable-report * { visibility: visible; }
-            .printable-report { position: absolute; left: 0; top: 0; width: 100%; }
+            body { background: white !important; color: black !important; }
+            .dashboard { box-shadow: none !important; border: none !important; width: 100% !important; max-width: none !important; margin: 0 !important; }
+            .btn, form, .header .version { display: none !important; }
+            .header { border-left: 8px solid #000 !important; }
+            h1 { color: black !important; }
+            .stat { border: 1px solid #000 !important; background: none !important; color: black !important; }
+            .stat-value, .accuracy { color: black !important; }
+            .preview-img { border: 1px solid #000 !important; width: 250px !important; }
+            * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
         }
     </style>
 </head>
 <body>
+
 <div class="dashboard">
     <div class="header">
-        <h1>FORENSIC AI ANALYZER</h1>
-        <p style="color: #888;">ADVANCED BPA RECOGNITION SYSTEM v3.0</p>
+        <h1>Forensic AI Analyzer</h1>
+        <p class="version">ADVANCED BPA RECOGNITION SYSTEM v3.0</p>
     </div>
 
     <form method="POST" enctype="multipart/form-data">
-        <input type="file" name="file" required style="margin-bottom: 20px;">
-        <br>
-        <button type="submit" class="analyze-btn">START DEEP SCAN</button>
+        <div class="upload-section">
+            <input type="file" name="file" accept="image/*">
+            <button type="submit" class="btn btn-scan">Start Deep Scan</button>
+        </div>
     </form>
 
     {% if error %}
-    <div class="error-box">{{ error }}</div>
+    <div class="error-box">
+        <strong>{{ error }}</strong>
+    </div>
     {% endif %}
 
     {% if data %}
-    <div class="result-grid">
-        <div>
-            <h3 style="color: #888;">EVIDENCE VISUALIZATION:</h3>
-            <img src="{{ data.path }}" alt="Evidence">
+    <div class="result-card">
+        <h3 style="color: #8b949e; text-transform: uppercase; font-size: 0.9rem;">Evidence Visualization:</h3>
+        <img src="{{ data.path }}" class="preview-img" alt="Forensic Scan">
+        
+        <div class="stat">
+            <span class="stat-title">Classification:</span>
+            <span class="stat-value">{{ data.pattern }}</span>
         </div>
-        <div>
-            <div class="stat-box">
-                <h4 style="margin:0; color: #888;">CLASSIFICATION:</h4>
-                <h2 style="margin: 5px 0;">{{ data.pattern }}</h2>
-            </div>
-            <div class="stat-box" style="border-color: #ff0055;">
-                <h4 style="margin:0; color: #888;">ACCURACY:</h4>
-                <h2 style="color:#ff0055; margin: 5px 0;">{{ data.confidence }}</h2>
-            </div>
-            <p><strong>REASONING:</strong> {{ data.reasoning }}</p>
-            <button onclick="window.print()" class="analyze-btn" style="width: 100%; background: white; color: black; border: 1px solid black;">
-                DOWNLOAD REPORT (PDF)
-            </button>
+
+        <div class="stat">
+            <span class="stat-title">Accuracy:</span>
+            <span class="stat-value accuracy">{{ data.confidence }}</span>
         </div>
+
+        <div style="margin-top: 15px; font-size: 0.9rem;">
+            <strong style="color: var(--accent-blue);">REASONING:</strong> {{ data.reasoning }}
+        </div>
+
+        <button onclick="window.print()" class="btn btn-download">Download Report (PDF)</button>
     </div>
     {% endif %}
 </div>
+
 </body>
 </html>
